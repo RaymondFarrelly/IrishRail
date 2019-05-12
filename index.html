@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<style>
+    #resultTable {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    #resultTable td,
+    #resultTable th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    
+    #resultTable tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    
+    #resultTable tr:hover {
+        background-color: #ddd;
+    }
+    
+    #resultTable th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #b942f4;
+        color: white;
+    }
+    
+</style>
+<script type="text/javascript">
+    var response, xmlDoc, Station;
+
+    function ChangeCode(form) {
+        Station = form.StationCode.value;
+        if (Station == "") {
+            alert("Please enter a valid code");
+        }
+        //alert ("You typed: " + Station);
+        Update();
+    }
+
+    function Update() {
+        function reqListener() {
+            //console.log(this.responseText);
+            response = this.responseText;
+            //document.write("<p>"+response+"</p>");
+
+            parser = new DOMParser();
+            xmlDoc = parser.parseFromString(response, "text/xml");
+            var tags = xmlDoc.getElementsByTagName("Origin");
+            var tableRef = document.getElementById("resultTable");
+
+            var rowCount = tableRef.rows.length;
+            for (var i = rowCount - 1; i > 0; i--) {
+                tableRef.deleteRow(i);
+            }
+
+            for (var i = 0; i < tags.length; i++) {
+
+                // Insert a row at the end of the table
+                var newRow = tableRef.insertRow();
+                // Insert a cell in the row at index 0
+                var Origin = newRow.insertCell(0);
+                Origin.innerHTML = xmlDoc.getElementsByTagName("Origin")[i].innerHTML;
+
+                var Destination = newRow.insertCell(1);
+                Destination.innerHTML = xmlDoc.getElementsByTagName("Destination")[i].innerHTML;
+
+                var Duein = newRow.insertCell(2);
+                Duein.innerHTML = xmlDoc.getElementsByTagName("Duein")[i].innerHTML+" mins";
+
+                var Exparrival = newRow.insertCell(3);
+                if(xmlDoc.getElementsByTagName("Exparrival")[i].innerHTML=="00:00"){
+                    Exparrival.innerHTML = xmlDoc.getElementsByTagName("Origintime")[i].innerHTML;
+                }else{
+                Exparrival.innerHTML = xmlDoc.getElementsByTagName("Exparrival")[i].innerHTML;
+                }
+
+                var Expdepart = newRow.insertCell(4);
+                if(xmlDoc.getElementsByTagName("Expdepart")[i].innerHTML=="00:00"){
+                    Expdepart.innerHTML = "Final stop";
+                }else{
+                Expdepart.innerHTML = xmlDoc.getElementsByTagName("Expdepart")[i].innerHTML;
+                }
+
+
+                /*console.log(xmlDoc.getElementsByTagName("Origin")[i].innerHTML);
+                console.log(xmlDoc.getElementsByTagName("Exparrival")[i].innerHTML);
+                console.log(xmlDoc.getElementsByTagName("Destination")[i].innerHTML);
+                console.log(xmlDoc.getElementsByTagName("Origintime")[i].innerHTML);
+                console.log(xmlDoc.getElementsByTagName("Scharrival")[i].innerHTML);*/
+            }
+
+        }
+
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", reqListener);
+        var url = 'https://cors-anywhere.herokuapp.com/http://api.irishrail.ie/realtime/realtime.asmx/getStationDataByCodeXML_WithNumMins?StationCode='+Station+'&NumMins=90&format=xml';
+         oReq.open("GET", url);
+
+        oReq.send();
+    }
+
+    function ViewTrainCodes() {
+        var x = document.getElementById("toggleCodes");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>
+
+<head>
+    <title>Irish Rail Times</title>
+</head>
+<H1 style="font-family: Trebuchet MS, Arial, Helvetica, sans-serif">Irish Rail Times</H1>
+
+<body>
+    <div style="font-family: Trebuchet MS, Arial, Helvetica, sans-serif">Enter a valid train code below to find out real time information. If you do not know the code use the "Find train code" option.
+    
+        <br>
+        <form id="form" style="font-family: Trebuchet MS, Arial, Helvetica, sans-serif">
+            Station Code:
+            <br>
+            <input type="text" name="StationCode" value="">
+            <INPUT TYPE="button" type="submit"NAME="button" Value="Click" onClick="ChangeCode(this.form)" style="font-family: Trebuchet MS, Arial, Helvetica, sans-serif">
+            <br>
+        </form>
+        <button onclick="ViewTrainCodes()" style=" font-family: Trebuchet MS, Arial, Helvetica, sans-serif">Find train code</button>
+    </div>
+    <div>
+        <table id="resultTable">
+            <tr>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Due in</th>
+                <th>Expected Arrival</th>
+                <th>Extended Departure</th>
+            </tr>
+
+        </table>
+    </div>
+    <div id="toggleCodes" style="display: none;font-family: Trebuchet MS, Arial, Helvetica, sans-serif">
+        <ul>
+            <li>Adamstown::ADAMF</li>
+            <li> Adamstown::ADAMS</li>
+            <li> Adamstown::ADMTN</li>
+            <li> Ardrahan::ARHAN</li>
+            <li> Arklow::ARKLW</li>
+            <li> Ashtown::ASHTN</li>
+            <li> Athenry::ATHRY</li>
+            <li> Athlone::ATLNE</li>
+            <li> Athy::ATHY </li>
+            <li> Attymon::ATMON</li>
+            <li> Balbriggan::BBRGN</li>
+            <li> Ballina::BALNA</li>
+            <li> Ballinasloe::BSLOE</li>
+            <li> Ballybrophy::BBRHY</li>
+            <li> Ballycullane::BCLAN</li>
+            <li> Ballyhaunis::BYHNS</li>
+            <li> Ballymote::BMOTE</li>
+            <li> Banteer::BTEER</li>
+            <li> Bayside::BYSDE</li>
+            <li> Belfast Central::BFSTC</li>
+            <li> Birdhill::BHILL</li>
+            <li> Blackrock::BROCK</li>
+            <li> Booterstown::BTSTN</li>
+            <li> Boyle::BOYLE</li>
+            <li> Bray::BRAY </li>
+            <li> Bridgetown::BRGTN</li>
+            <li> Broombridge::BBRDG</li>
+            <li> CENTRAL JUNCTION::CENTJ</li>
+            <li> CITY JUNCTION::CITYJ</li>
+            <li> Cahir::CAHIR</li>
+            <li> Campile::CPILE</li>
+            <li> Carlow::CRLOW</li>
+            <li> Carrick on Shannon::CKOSH</li>
+            <li> Carrick on Suir::CKOSR</li>
+            <li> Carrigaloe::CGLOE</li>
+            <li> Carrigtwohill::CGTWL</li>
+            <li> Castlebar::CLBAR</li>
+            <li> Castleconnell::CCONL</li>
+            <li> Castleknock::CNOCK</li>
+            <li> Castlerea::CSREA</li>
+            <li> Charleville::CVILL</li>
+            <li> Cherry Orchard::CHORC</li>
+            <li> Cherry Orchard::PWESF</li>
+            <li> Clara::CLARA</li>
+            <li> Claremorris::CLMRS</li>
+            <li> Clondalkin::CLDKN</li>
+            <li> Clondalkin::CLONF</li>
+            <li> Clondalkin::CLONS</li>
+            <li> Clongriffin::GRGRD</li>
+            <li> Clonmel::CLMEL</li>
+            <li> Clonsilla::CLSLA</li>
+            <li> Clontarf Road::CTARF</li>
+            <li> Cloughjordan::CJRDN</li>
+            <li> Cobh::COBH </li>
+            <li> Collooney::COLNY</li>
+            <li> Coolmine::CMINE</li>
+            <li> Cork::CORK </li>
+            <li> Craughwell::CRGHW</li>
+            <li> Curragh::CURAH</li>
+            <li> DUNMURRAY::DUNMR</li>
+            <li> Dalkey::DLKEY</li>
+            <li> Docklands::DCKLS</li>
+            <li> Donabate::DBATE</li>
+            <li> Drogheda::DGHDA</li>
+            <li> Dromod::DRMOD</li>
+            <li> Drumcondra::DCDRA</li>
+            <li> Dublin Connolly::CNLLY</li>
+            <li> Dublin Heuston::HSTON</li>
+            <li> Dublin Pearse::PERSE</li>
+            <li> Dun Laoghaire::DLERY</li>
+            <li> Dunboyne::DBYNE</li>
+            <li> Dundalk::DDALK</li>
+            <li> Edgeworthstown::ETOWN</li>
+            <li> Enfield::ENFLD</li>
+            <li> Ennis::ENNIS</li>
+            <li> Enniscorthy::ECRTY</li>
+            <li> Farranfore::FFORE</li>
+            <li> Fota::FOTA </li>
+            <li> Foxford::FXFRD</li>
+            <li> Galway::GALWY</li>
+            <li> Glenageary::GLGRY</li>
+            <li> Glounthaune::GHANE</li>
+            <li> Gorey::GOREY</li>
+            <li> Gormanston::GSTON</li>
+            <li> Gort::GORT</li>
+            <li> Grand Canal Dock::GCDK </li>
+            <li> Greystones::GSTNS</li>
+            <li> Hansfield::HAFLD</li>
+            <li> Harmonstown::HTOWN</li>
+            <li> Hazelhatch::HAZEF</li>
+            <li> Hazelhatch::HAZES</li>
+            <li> Hazelhatch::HZLCH</li>
+            <li> Howth Junction::HWTHJ</li>
+            <li> Howth::HOWTH</li>
+            <li> Kilbarrack::KBRCK</li>
+            <li> Kilcock::KCOCK</li>
+            <li> Kilcoole::KCOOL</li>
+            <li> Kildare::KDARE</li>
+            <li> Kilkenny::KKNNY</li>
+            <li> Killarney::KLRNY</li>
+            <li> Killester::KLSTR</li>
+            <li> Killiney::KILNY</li>
+            <li> Lansdowne Road::LDWNE</li>
+            <li> Laytown::LTOWN</li>
+            <li> Leixlip (Confey)::LXCON</li>
+            <li> Leixlip (Louisa Bridge)::LXLSA</li>
+            <li> Limerick Junction::LMRKJ</li>
+            <li> Limerick::LMRCK</li>
+            <li> Lisburn::LBURN</li>
+            <li> LittleIsland::LSLND</li>
+            <li> Longford::LFORD</li>
+            <li> Lurgan::LURGN</li>
+            <li> M3 Parkway::M3WAY</li>
+            <li> MOIRA::MOIRA</li>
+            <li> Malahide::MHIDE</li>
+            <li> Mallow::MLLOW</li>
+            <li> Manulla Junction::MNLAJ</li>
+            <li> Maynooth::MYNTH</li>
+            <li> Midleton::MDLTN</li>
+            <li> Millstreet::MLSRT</li>
+            <li> Monasterevin::MONVN</li>
+            <li> Muine Bheag::MNEBG</li>
+            <li> Mullingar::MLGAR</li>
+            <li> Navan Road Parkway::PHNPK</li>
+            <li> Nenagh::NNAGH</li>
+            <li> Newbridge::NBRGE</li>
+            <li> Newry::NEWRY</li>
+            <li> Oranmore::ORNMR</li>
+            <li> PARK WEST::PWESS</li>
+            <li> Portadown::PDOWN</li>
+            <li> Portarlington::PTRTN</li>
+            <li> Portlaoise::PTLSE</li>
+            <li> Portmarnock::PMNCK</li>
+            <li> Raheny::RAHNY</li>
+            <li> Rathdrum::RDRUM</li>
+            <li> Rathmore::RMORE</li>
+            <li> Roscommon::RSCMN</li>
+            <li> Roscrea::RCREA</li>
+            <li> Rosslare Europort::RLEPT</li>
+            <li> Rosslare Strand::RLSTD</li>
+            <li> Rush and Lusk::RLUSK</li>
+            <li> Rushbrooke::RBROK</li>
+            <li> Sallins::SALNS</li>
+            <li> Salthill::SHILL</li>
+            <li> Sandycove::SCOVE</li>
+            <li> Sandymount::SMONT</li>
+            <li> Seapoint::SEAPT</li>
+            <li> Shankill::SKILL</li>
+            <li> Sixmilebridge::SXMBR</li>
+            <li> Skerries::SKRES</li>
+            <li> Sligo::SLIGO</li>
+            <li> Sutton::SUTTN</li>
+            <li> Sydney Parade::SIDNY</li>
+            <li> Tara Street::TARA </li>
+            <li> Templemore::TPMOR</li>
+            <li> Thomastown::THTWN</li>
+            <li> Thurles::THRLS</li>
+            <li> Tipperary::TIPRY</li>
+            <li> Tralee::TRLEE</li>
+            <li> Tullamore::TMORE</li>
+            <li> Waterford::WFORD</li>
+            <li> Wellingtonbridge::WBDGE</li>
+            <li> Westport::WPORT</li>
+            <li> Wexford::WXFRD</li>
+            <li> Wicklow::WLOW </li>
+            <li> Woodbrook::WBROK</li>
+            <li> Woodlawn::WLAWN</li>
+        </ul>
+    </div>
+</body>
+
+</html>
